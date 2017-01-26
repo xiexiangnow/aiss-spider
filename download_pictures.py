@@ -52,22 +52,25 @@ def download_one(img):
     url, directory, filepath = img
     # 如果文件已经存在，放弃下载
     if os.path.exists(filepath):
+        print('exists:', filepath)
         return
 
     setup_download_dir(directory)
     rsp = requests.get(url)
+    print('start download', url)
     with open(filepath, 'wb') as f:
         f.write(rsp.content)
+        print('end download', url)
 
 
 def download(imgs, processes=10):
     """ 并发下载所有图片 """
+    start_time = time.time()
     pool = Pool(processes)
     for img in imgs:
         pool.apply_async(download_one, (img, ))
 
     pool.close()
-    start_time = time.time()
     pool.join()
     end_time = time.time()
     print('下载完毕,用时:%s秒' % (end_time - start_time))
